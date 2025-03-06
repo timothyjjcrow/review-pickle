@@ -1,0 +1,316 @@
+{% extends 'base.html' %} {% block title %}Pickleball Equipment Reviews -
+PicklePulse{% endblock %} {% block meta_description %}Browse our comprehensive
+reviews of pickleball paddles, balls, shoes, nets, and accessories. Find the
+best equipment for your game.{% endblock %} {% block extra_head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/reviews.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-4">Pickleball Equipment Reviews</h1>
+      <p class="lead">
+        Find the best gear for your game with our in-depth, expert reviews.
+      </p>
+    </div>
+    <div class="col-md-4">
+      <div class="filter-controls p-3 bg-light rounded">
+        <h5>Filter Reviews</h5>
+        <form id="filter-form">
+          <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="category-filter">
+              <option value="">All Categories</option>
+              <option value="paddles">Paddles</option>
+              <option value="balls">Balls</option>
+              <option value="shoes">Shoes</option>
+              <option value="nets">Nets</option>
+              <option value="apparel">Apparel</option>
+              <option value="accessories">Accessories</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Brand</label>
+            <select class="form-select" id="brand-filter">
+              <option value="">All Brands</option>
+              <option value="selkirk">Selkirk</option>
+              <option value="engage">Engage</option>
+              <option value="paddletek">Paddletek</option>
+              <option value="franklin">Franklin</option>
+              <option value="onix">Onix</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Sort By</label>
+            <select class="form-select" id="sort-filter">
+              <option value="rating:desc">Highest Rated</option>
+              <option value="created_at:desc">Newest First</option>
+              <option value="created_at:asc">Oldest First</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            Apply Filters
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div id="reviews-loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading reviews...</p>
+      </div>
+
+      <div id="reviews-container" class="row g-4">
+        <!-- Reviews will be loaded here via JavaScript -->
+      </div>
+
+      <div id="no-reviews" class="alert alert-info text-center my-5 d-none">
+        No reviews found matching your criteria. Try adjusting your filters.
+      </div>
+
+      <div class="pagination-container text-center mt-5">
+        <nav aria-label="Review pagination">
+          <ul class="pagination justify-content-center" id="pagination">
+            <!-- Pagination will be generated via JavaScript -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Card Template -->
+<template id="review-card-template">
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 review-card">
+      <div class="review-image-container">
+        <img src="" class="card-img-top review-image" alt="" />
+        <div class="rating-badge"><span class="rating-value">0.0</span>/10</div>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title review-title"></h5>
+        <p class="card-text review-brand text-muted"></p>
+        <p class="card-text review-excerpt"></p>
+      </div>
+      <div class="card-footer bg-white border-top-0">
+        <a href="#" class="btn btn-primary read-more">Read Full Review</a>
+      </div>
+    </div>
+  </div>
+</template>
+{% endblock %} {% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get elements
+    const reviewsContainer = document.getElementById("reviews-container");
+    const loadingIndicator = document.getElementById("reviews-loading");
+    const noReviewsMessage = document.getElementById("no-reviews");
+    const paginationContainer = document.getElementById("pagination");
+    const filterForm = document.getElementById("filter-form");
+    const reviewTemplate = document.getElementById("review-card-template");
+
+    // Current page and filters
+    let currentPage = 1;
+    let currentFilters = {
+      category: "",
+      brand: "",
+      sort: "rating:desc",
+      q: new URLSearchParams(window.location.search).get("q") || "",
+    };
+
+    // Set initial filter values from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("category")) {
+      document.getElementById("category-filter").value =
+        urlParams.get("category");
+      currentFilters.category = urlParams.get("category");
+    }
+    if (urlParams.has("brand")) {
+      document.getElementById("brand-filter").value = urlParams.get("brand");
+      currentFilters.brand = urlParams.get("brand");
+    }
+    if (urlParams.has("sort")) {
+      document.getElementById("sort-filter").value = urlParams.get("sort");
+      currentFilters.sort = urlParams.get("sort");
+    }
+
+    // Load reviews
+    loadReviews();
+
+    // Handle filter form submission
+    filterForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      currentPage = 1;
+      currentFilters.category =
+        document.getElementById("category-filter").value;
+      currentFilters.brand = document.getElementById("brand-filter").value;
+      currentFilters.sort = document.getElementById("sort-filter").value;
+
+      // Update URL with filters
+      const newUrl = new URL(window.location);
+      if (currentFilters.category)
+        newUrl.searchParams.set("category", currentFilters.category);
+      else newUrl.searchParams.delete("category");
+
+      if (currentFilters.brand)
+        newUrl.searchParams.set("brand", currentFilters.brand);
+      else newUrl.searchParams.delete("brand");
+
+      if (currentFilters.sort)
+        newUrl.searchParams.set("sort", currentFilters.sort);
+      else newUrl.searchParams.delete("sort");
+
+      window.history.pushState({}, "", newUrl);
+
+      loadReviews();
+    });
+
+    // Function to load reviews
+    function loadReviews() {
+      // Show loading indicator
+      loadingIndicator.classList.remove("d-none");
+      reviewsContainer.innerHTML = "";
+      noReviewsMessage.classList.add("d-none");
+
+      // Build API URL
+      let apiUrl = `/api/reviews/?page=${currentPage}`;
+      if (currentFilters.category)
+        apiUrl += `&category=${currentFilters.category}`;
+      if (currentFilters.brand) apiUrl += `&brand=${currentFilters.brand}`;
+      if (currentFilters.sort) apiUrl += `&sort=${currentFilters.sort}`;
+      if (currentFilters.q) apiUrl += `&q=${currentFilters.q}`;
+
+      // Fetch reviews
+      fetch(apiUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          // Hide loading indicator
+          loadingIndicator.classList.add("d-none");
+
+          if (data.results.length === 0) {
+            noReviewsMessage.classList.remove("d-none");
+            return;
+          }
+
+          // Render reviews
+          data.results.forEach((review) => {
+            const reviewCard = reviewTemplate.content.cloneNode(true);
+
+            // Set review data
+            reviewCard.querySelector(".review-title").textContent =
+              review.title;
+            reviewCard.querySelector(".review-brand").textContent =
+              review.product.brand;
+            reviewCard.querySelector(".review-excerpt").textContent =
+              review.content.substring(0, 100) + "...";
+            reviewCard.querySelector(".rating-value").textContent =
+              review.rating.toFixed(1);
+            reviewCard.querySelector(
+              ".read-more"
+            ).href = `/reviews/${review.id}`;
+
+            // Set image if available
+            const imageElement = reviewCard.querySelector(".review-image");
+            if (review.images && review.images.length > 0) {
+              const primaryImage =
+                review.images.find((img) => img.is_primary) || review.images[0];
+              imageElement.src = primaryImage.url;
+              imageElement.alt = primaryImage.alt_text || review.title;
+            } else {
+              imageElement.src = "/static/img/placeholder.jpg";
+              imageElement.alt = "No image available";
+            }
+
+            reviewsContainer.appendChild(reviewCard);
+          });
+
+          // Generate pagination
+          generatePagination(data.total, 10); // 10 items per page
+        })
+        .catch((error) => {
+          console.error("Error loading reviews:", error);
+          loadingIndicator.classList.add("d-none");
+          noReviewsMessage.classList.remove("d-none");
+          noReviewsMessage.textContent =
+            "Error loading reviews. Please try again later.";
+        });
+    }
+
+    // Function to generate pagination
+    function generatePagination(total, perPage) {
+      const totalPages = Math.ceil(total / perPage);
+      paginationContainer.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      // Previous button
+      const prevLi = document.createElement("li");
+      prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+      const prevLink = document.createElement("a");
+      prevLink.className = "page-link";
+      prevLink.href = "#";
+      prevLink.innerHTML = "&laquo;";
+      prevLink.setAttribute("aria-label", "Previous");
+      if (currentPage > 1) {
+        prevLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          currentPage--;
+          loadReviews();
+          window.scrollTo(0, 0);
+        });
+      }
+      prevLi.appendChild(prevLink);
+      paginationContainer.appendChild(prevLi);
+
+      // Page numbers
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + 4);
+
+      for (let i = startPage; i <= endPage; i++) {
+        const pageLi = document.createElement("li");
+        pageLi.className = `page-item ${i === currentPage ? "active" : ""}`;
+        const pageLink = document.createElement("a");
+        pageLink.className = "page-link";
+        pageLink.href = "#";
+        pageLink.textContent = i;
+        pageLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          currentPage = i;
+          loadReviews();
+          window.scrollTo(0, 0);
+        });
+        pageLi.appendChild(pageLink);
+        paginationContainer.appendChild(pageLi);
+      }
+
+      // Next button
+      const nextLi = document.createElement("li");
+      nextLi.className = `page-item ${
+        currentPage === totalPages ? "disabled" : ""
+      }`;
+      const nextLink = document.createElement("a");
+      nextLink.className = "page-link";
+      nextLink.href = "#";
+      nextLink.innerHTML = "&raquo;";
+      nextLink.setAttribute("aria-label", "Next");
+      if (currentPage < totalPages) {
+        nextLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          currentPage++;
+          loadReviews();
+          window.scrollTo(0, 0);
+        });
+      }
+      nextLi.appendChild(nextLink);
+      paginationContainer.appendChild(nextLi);
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,673 @@
+{% extends 'base.html' %} {% block title %}PickleballPro Reviews - Expert Gear
+Reviews & Guides{% endblock %} {% block meta_description %}Find expert
+pickleball gear reviews, buying guides, and equipment recommendations for
+players of all levels.{% endblock %} {% block extra_css %}
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+/>
+<style>
+  :root {
+    --primary: #3498db;
+    --primary-dark: #2980b9;
+    --secondary: #2ecc71;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --text: #333333;
+    --text-light: #666666;
+    --border: #e1e1e1;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+  }
+
+  /* Hero Section */
+  .hero-home {
+    position: relative;
+    height: 80vh;
+    min-height: 600px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url("https://images.unsplash.com/photo-1622977266039-dbb162254c12?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    color: white;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .btn-hero-primary {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+
+  .btn-hero-primary:hover {
+    background-color: var(--primary-dark);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-hero-outline {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 30px;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+
+  .btn-hero-outline:hover {
+    background-color: white;
+    color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Categories Section */
+  .categories-section {
+    padding: 5rem 0;
+    background-color: var(--light);
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-title h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+
+  .section-title p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .category-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 2rem;
+    transition: var(--transition);
+    height: 100%;
+  }
+
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-image {
+    height: 220px;
+    overflow: hidden;
+  }
+
+  .category-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+  }
+
+  .category-card:hover .category-image img {
+    transform: scale(1.05);
+  }
+
+  .category-content {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .category-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .category-content p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Product Cards */
+  .featured-products {
+    padding: 5rem 0;
+  }
+
+  .product-card {
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    height: 100%;
+    background-color: white;
+    box-shadow: var(--box-shadow);
+    position: relative;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-img-container {
+    position: relative;
+    overflow: hidden;
+    height: 250px;
+  }
+
+  .product-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .product-card:hover .product-img-container img {
+    transform: scale(1.05);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 20px;
+    z-index: 2;
+  }
+
+  .price-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 12px;
+    background: var(--secondary);
+    color: white;
+    border-radius: 20px;
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .product-card-body {
+    padding: 1.5rem;
+  }
+
+  .product-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark);
+    line-height: 1.4;
+  }
+
+  .brand-badge {
+    display: inline-block;
+    background-color: var(--light);
+    color: var(--text-light);
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+  }
+
+  .rating-stars {
+    color: #ffc107;
+    margin-bottom: 0.75rem;
+  }
+
+  .rating-value {
+    color: var(--dark);
+    font-weight: 600;
+    margin-left: 5px;
+  }
+
+  .product-summary {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+  }
+
+  .product-footer {
+    border-top: 1px solid var(--light);
+    padding-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .review-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .review-btn:hover {
+    background-color: var(--primary-dark);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .review-btn i {
+    margin-left: 5px;
+  }
+
+  /* Testimonials Section */
+  .testimonials-section {
+    padding: 5rem 0;
+    background-color: var(--light);
+  }
+
+  .testimonial-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 2rem;
+    height: 100%;
+    transition: var(--transition);
+  }
+
+  .testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .testimonial-content {
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    line-height: 1.8;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+  }
+
+  .testimonial-author img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    object-fit: cover;
+  }
+
+  .author-info h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .author-info p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+  }
+
+  /* Newsletter Section */
+  .newsletter-section {
+    background: linear-gradient(
+      135deg,
+      var(--primary-dark) 0%,
+      var(--primary) 100%
+    );
+    padding: 4rem 0;
+    color: white;
+  }
+
+  @media (max-width: 991.98px) {
+    .hero-content h1 {
+      font-size: 2.5rem;
+    }
+
+    .hero-content p {
+      font-size: 1rem;
+    }
+
+    .hero-buttons {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .hero-home {
+      min-height: 450px;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<!-- Hero Section -->
+<section class="hero-home">
+  <div class="container">
+    <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
+      <h1 class="display-4 fw-bold">
+        Honest Reviews for Pickleball Enthusiasts
+      </h1>
+      <p class="lead mb-4">
+        We test the latest pickleball gear so you can make informed buying
+        decisions and elevate your game.
+      </p>
+      <div class="hero-buttons">
+        <a href="{{ url_for('reviews.reviews_list') }}" class="btn-hero-primary"
+          >Explore Products</a
+        >
+        <a href="#categories" class="btn-hero-outline">Browse Categories</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section" id="categories">
+  <div class="container">
+    <div class="section-title" data-aos="fade-up" data-aos-duration="800">
+      <h2>Shop by Category</h2>
+      <p>
+        Explore reviews in our most popular pickleball equipment categories.
+      </p>
+    </div>
+    <div class="row">
+      {% for category in categories %}
+      <div
+        class="col-md-4"
+        data-aos="fade-up"
+        data-aos-duration="800"
+        data-aos-delay="{{ loop.index * 100 }}"
+      >
+        <div class="category-card">
+          <div class="category-image">
+            {% if category == 'paddles' %}
+            <img
+              src="https://joolausa.com/cdn/shop/files/C2-Standard-Web1_2000x.png"
+              alt="Pickleball Paddles"
+            />
+            {% elif category == 'balls' %}
+            <img
+              src="https://franklinsports.com/cdn/shop/files/20240312_Franklin_Web_Pickleball_Balls_97_1800x1800.jpg"
+              alt="Pickleball Balls"
+            />
+            {% else %}
+            <img
+              src="https://franklinsports.com/cdn/shop/products/FS_PICKLEBALL-BAG-SLING-BLACK-FRONT-PRODUCT_2000x2000.jpg"
+              alt="Pickleball Accessories"
+            />
+            {% endif %}
+          </div>
+          <div class="category-content">
+            <h3>{{ category|capitalize }}</h3>
+            {% if category == 'paddles' %}
+            <p>
+              Find the perfect paddle to match your playing style and skill
+              level.
+            </p>
+            {% elif category == 'balls' %}
+            <p>
+              Indoor or outdoor, tournament-grade or recreational - we've tested
+              them all.
+            </p>
+            {% else %}
+            <p>
+              Bags, court shoes, protective gear, and other essential
+              accessories.
+            </p>
+            {% endif %}
+            <a
+              href="{{ url_for('reviews.apply_filter', category=category) }}"
+              class="btn btn-primary"
+              >View {{ category|capitalize }}</a
+            >
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products -->
+<section class="featured-products">
+  <div class="container">
+    <div class="section-title" data-aos="fade-up" data-aos-duration="800">
+      <h2>Top-Rated Gear for 2024</h2>
+      <p>Our experts' picks for the best pickleball equipment this year.</p>
+    </div>
+    <div class="row g-4">
+      {% for review in featured_reviews %}
+      <div
+        class="col-md-4"
+        data-aos="fade-up"
+        data-aos-duration="800"
+        data-aos-delay="{{ loop.index * 100 }}"
+      >
+        <div class="product-card">
+          <div class="product-img-container">
+            <img
+              src="{{ review.image_url }}"
+              alt="{{ review.title }}"
+              loading="lazy"
+              onerror="this.onerror=null; this.src='https://placehold.co/800x600/a5d6a7/ffffff?text={{ review.title|urlencode }}'; this.classList.add('fallback-image');"
+            />
+            <div class="product-badge">{{ review.category|capitalize }}</div>
+            <div class="price-badge">${{ review.price }}</div>
+          </div>
+          <div class="product-card-body">
+            <div class="brand-badge">{{ review.brand }}</div>
+            <h5 class="product-title">{{ review.title }}</h5>
+            <div class="rating-stars">
+              {% for i in range(5) %}
+              <i
+                class="fas fa-star{% if i < review.rating|int %}-fill{% elif i < review.rating %}-half{% endif %}"
+              ></i>
+              {% endfor %}
+              <span class="rating-value">{{ review.rating }}</span>
+            </div>
+            <p class="product-summary">
+              {{ review.summary[:100] }}{% if review.summary|length > 100
+              %}...{% endif %}
+            </p>
+            <div class="product-footer">
+              <div class="stats-badge">
+                <i class="fas fa-calendar"></i> {{ review.release_date }}
+              </div>
+              <a
+                href="{{ url_for('reviews.review_detail', review_id=review.id) }}"
+                class="review-btn"
+              >
+                Read Review <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-title" data-aos="fade-up" data-aos-duration="800">
+      <h2>Players Love Our Reviews</h2>
+      <p>
+        See what our community says about our honest, in-depth pickleball gear
+        reviews.
+      </p>
+    </div>
+    <div class="row">
+      <div
+        class="col-md-4"
+        data-aos="fade-up"
+        data-aos-duration="800"
+        data-aos-delay="100"
+      >
+        <div class="testimonial-card">
+          <div class="testimonial-content">
+            "I was hesitant about upgrading my paddle until I read the reviews
+            here. The detailed comparison helped me find the perfect match for
+            my playing style. Now my game has improved significantly!"
+          </div>
+          <div class="testimonial-author">
+            <img
+              src="https://images.unsplash.com/photo-1623479322729-28b25c16b011?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGlja2xlYmFsbCUyMHBsYXllcnxlbnwwfHwwfHx8MA%3D%3D"
+              alt="Sarah Johnson"
+            />
+            <div class="author-info">
+              <h4>Sarah Johnson</h4>
+              <p>4.0 Tournament Player</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="col-md-4"
+        data-aos="fade-up"
+        data-aos-duration="800"
+        data-aos-delay="200"
+      >
+        <div class="testimonial-card">
+          <div class="testimonial-content">
+            "These reviews go beyond just specs—they talk about how the gear
+            actually performs on the court. The pro/con breakdowns for each
+            product have saved me from making expensive mistakes."
+          </div>
+          <div class="testimonial-author">
+            <img
+              src="https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dGVubmlzJTIwcGxheWVyfGVufDB8fDB8fHww"
+              alt="Michael Chen"
+            />
+            <div class="author-info">
+              <h4>Michael Chen</h4>
+              <p>Recreational Player</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="col-md-4"
+        data-aos="fade-up"
+        data-aos-duration="800"
+        data-aos-delay="300"
+      >
+        <div class="testimonial-card">
+          <div class="testimonial-content">
+            "As a pickleball coach, I recommend this site to all my students.
+            The educational content alongside the reviews helps new players
+            understand what to look for in equipment as they progress."
+          </div>
+          <div class="testimonial-author">
+            <img
+              src="https://images.unsplash.com/photo-1633113088985-be50c61371a5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRlbm5pcyUyMGNvYWNofGVufDB8fDB8fHww"
+              alt="David Rodriguez"
+            />
+            <div class="author-info">
+              <h4>David Rodriguez</h4>
+              <p>Certified Pickleball Instructor</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div
+        class="col-lg-6 mb-4 mb-lg-0"
+        data-aos="fade-right"
+        data-aos-duration="800"
+      >
+        <h2 class="fw-bold mb-3">Get Exclusive Gear Reviews</h2>
+        <p class="opacity-75 mb-0">
+          Subscribe to our newsletter and be the first to read about new
+          releases, special offers, and pro tips.
+        </p>
+      </div>
+      <div class="col-lg-6" data-aos="fade-left" data-aos-duration="800">
+        <form class="d-flex">
+          <input
+            type="email"
+            class="form-control form-control-lg shadow-sm me-2"
+            placeholder="Your email address"
+            required
+          />
+          <button type="submit" class="btn btn-light btn-lg shadow-sm px-4">
+            Subscribe
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize AOS animations
+    AOS.init({
+      once: true,
+      offset: 100,
+    });
+  });
+</script>
+{% endblock %}

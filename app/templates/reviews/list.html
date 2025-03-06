@@ -1,0 +1,608 @@
+{% extends 'base.html' %}
+{% block title %}Pickleball Equipment Reviews - PicklePulse{% endblock %}
+{% block meta_description %}Browse our comprehensive collection of pickleball equipment reviews. Find detailed information and ratings for paddles, balls, shoes, and accessories.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reviews.css') }}" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+<style>
+  :root {
+    --primary: #0e8a5f;
+    --primary-dark: #076e4c;
+    --primary-light: #e6f3ef;
+    --secondary: #2c3e50;
+    --accent: #ff7d3b;
+    --light-gray: #f8f9fa;
+    --medium-gray: #e9ecef;
+    --dark-gray: #6c757d;
+    --white: #ffffff;
+    --black: #212529;
+    --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: all 0.3s ease;
+  }
+
+  .hero-reviews {
+    position: relative;
+    height: 40vh;
+    min-height: 350px;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    color: white;
+  }
+
+  .hero-reviews::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
+    z-index: 0;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .filter-section {
+    background-color: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    transition: var(--transition);
+  }
+
+  .filter-title {
+    font-size: 1.1rem;
+    color: var(--secondary);
+    margin-bottom: 1.25rem;
+    font-weight: 600;
+  }
+
+  .filter-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-label {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+  }
+
+  .filter-tag {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 30px;
+    background-color: var(--light-gray);
+    margin-right: 8px;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+  }
+
+  .filter-tag:hover {
+    background-color: var(--medium-gray);
+    transform: translateY(-2px);
+  }
+
+  .filter-tag.active {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: var(--primary);
+    font-weight: 500;
+  }
+
+  .filter-select {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--medium-gray);
+    background-color: var(--white);
+    color: var(--secondary);
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(14, 138, 95, 0.1);
+  }
+
+  .filter-button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    width: 100%;
+  }
+
+  .filter-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .active-filter {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    padding: 8px 16px;
+    border-radius: 30px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+
+  .active-filter:hover {
+    background-color: rgba(14, 138, 95, 0.2);
+  }
+
+  .active-filter i {
+    margin-left: 6px;
+    cursor: pointer;
+  }
+
+  .clear-filters {
+    color: var(--dark-gray);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: var(--transition);
+  }
+
+  .clear-filters:hover {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+
+  .product-card {
+    transition: var(--transition);
+    border-radius: var(--radius);
+    overflow: hidden;
+    height: 100%;
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-img-container {
+    position: relative;
+    overflow: hidden;
+    height: 250px;
+  }
+
+  .product-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .product-card:hover .product-img-container img {
+    transform: scale(1.05);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 20px;
+    z-index: 2;
+  }
+
+  .price-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 12px;
+    background: var(--accent);
+    color: white;
+    border-radius: 20px;
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .product-card-body {
+    padding: 1.5rem;
+  }
+
+  .product-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--secondary);
+    line-height: 1.4;
+  }
+
+  .brand-badge {
+    display: inline-block;
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+  }
+
+  .rating-stars {
+    color: #ffc107;
+    margin-bottom: 0.75rem;
+  }
+
+  .rating-value {
+    color: var(--secondary);
+    font-weight: 600;
+    margin-left: 5px;
+  }
+
+  .product-summary {
+    font-size: 0.875rem;
+    color: var(--dark-gray);
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+  }
+
+  .product-footer {
+    border-top: 1px solid var(--medium-gray);
+    padding-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .review-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .review-btn:hover {
+    background-color: var(--primary-dark);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .review-btn i {
+    margin-left: 5px;
+  }
+
+  .no-results {
+    background-color: var(--light-gray);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    margin: 2rem 0;
+  }
+
+  .no-results-icon {
+    font-size: 3rem;
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 3rem 0 1rem;
+    padding: 0;
+  }
+
+  .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .page-link {
+    color: var(--primary);
+    border: 1px solid var(--medium-gray);
+    transition: var(--transition);
+  }
+
+  .page-link:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: var(--primary);
+  }
+
+  .stats-badge {
+    display: flex;
+    align-items: center;
+    color: var(--dark-gray);
+    font-size: 0.75rem;
+  }
+
+  .stats-badge i {
+    margin-right: 3px;
+  }
+
+  .newsletter-section {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    padding: 4rem 0;
+    margin-top: 5rem;
+  }
+
+  @media (max-width: 991.98px) {
+    .filter-section {
+      margin-bottom: 2rem;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .hero-reviews {
+      min-height: 300px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-reviews" style="background-image: url('https://images.unsplash.com/photo-1622977266039-dbb162254c12?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+  <div class="container">
+    <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
+      <h1 class="display-5 fw-bold mb-2">Pickleball Equipment Reviews</h1>
+      <p class="lead mb-3 opacity-90">Find the perfect gear with expert recommendations</p>
+      <div class="d-flex flex-wrap">
+        {% for category in categories %}
+        <a href="{{ url_for('reviews.apply_filter', category=category) }}" class="filter-tag {% if current_category == category %}active{% endif %}">
+          {{ category|capitalize }}
+        </a>
+        {% endfor %}
+        <a href="{{ url_for('reviews.reviews_list') }}" class="filter-tag {% if not current_category %}active{% endif %}">
+          All Products
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-3 mb-4 mb-lg-0">
+      <div class="filter-section sticky-lg-top" style="top: 2rem;" data-aos="fade-right" data-aos-duration="800">
+        <h5 class="filter-title">Refine Results</h5>
+        
+        <form action="{{ url_for('reviews.apply_filter') }}" method="get">
+          <!-- Category Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Category</label>
+            <select name="category" class="filter-select">
+              <option value="">All Categories</option>
+              {% for category in categories %}
+              <option value="{{ category }}" {% if current_category == category %}selected{% endif %}>
+                {{ category|capitalize }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Brand Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Brand</label>
+            <select name="brand" class="filter-select">
+              <option value="">All Brands</option>
+              {% for brand in brands %}
+              <option value="{{ brand }}" {% if current_brand == brand %}selected{% endif %}>
+                {{ brand }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Price Range Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Price Range</label>
+            <select name="price_range" class="filter-select">
+              <option value="">Any Price</option>
+              <option value="under50" {% if current_price == 'under50' %}selected{% endif %}>Under $50</option>
+              <option value="50to100" {% if current_price == '50to100' %}selected{% endif %}>$50 - $100</option>
+              <option value="over100" {% if current_price == 'over100' %}selected{% endif %}>Over $100</option>
+            </select>
+          </div>
+          
+          <!-- Sort Options -->
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select name="sort_by" class="filter-select">
+              <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+              <option value="highest_rating" {% if current_sort == 'highest_rating' %}selected{% endif %}>Highest Rated</option>
+              <option value="lowest_price" {% if current_sort == 'lowest_price' %}selected{% endif %}>Price: Low to High</option>
+              <option value="highest_price" {% if current_sort == 'highest_price' %}selected{% endif %}>Price: High to Low</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="filter-button">
+            Apply Filters
+          </button>
+          
+          {% if active_filters|length > 0 %}
+          <div class="text-center mt-3">
+            <a href="{{ url_for('reviews.clear_filters') }}" class="clear-filters">Clear All Filters</a>
+          </div>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+    
+    <!-- Products Display -->
+    <div class="col-lg-9">
+      <!-- Active Filters -->
+      {% if active_filters|length > 0 %}
+      <div class="mb-4" data-aos="fade-up" data-aos-duration="800">
+        <div class="d-flex flex-wrap align-items-center">
+          <span class="me-2 text-secondary">Active Filters:</span>
+          {% for filter in active_filters %}
+          <div class="active-filter">
+            {{ filter.display }}
+            <a href="{{ url_for('reviews.remove_filter', type=filter.type, category=current_category if filter.type != 'category' else '', brand=current_brand if filter.type != 'brand' else '', price_range=current_price if filter.type != 'price' else '', sort_by=current_sort) }}">
+              <i class="bi bi-x"></i>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Results Summary -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="mb-0 text-secondary">
+          Showing {{ reviews|length }} of {{ total_reviews }} products
+        </p>
+      </div>
+      
+      <!-- Products Grid -->
+      {% if reviews|length > 0 %}
+      <div class="row g-4">
+        {% for review in reviews %}
+        <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="{{ loop.index * 100 }}">
+          <div class="product-card">
+            <div class="product-img-container">
+              <img src="{{ review.image_url }}" alt="{{ review.title }}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/800x600/a5d6a7/ffffff?text={{ review.title|urlencode }}'; this.classList.add('fallback-image');">
+              <div class="product-badge">{{ review.category|capitalize }}</div>
+              <div class="price-badge">${{ review.price }}</div>
+            </div>
+            <div class="product-card-body">
+              <div class="brand-badge">{{ review.brand }}</div>
+              <h5 class="product-title">{{ review.title }}</h5>
+              <div class="rating-stars">
+                {% for i in range(5) %}
+                <i class="bi bi-star{% if i < review.rating|int %}-fill{% elif i < review.rating %}-half{% endif %}"></i>
+                {% endfor %}
+                <span class="rating-value">{{ review.rating }}</span>
+              </div>
+              <p class="product-summary">
+                {{ review.summary[:100] }}{% if review.summary|length > 100 %}...{% endif %}
+              </p>
+              <div class="product-footer">
+                <div class="d-flex gap-2">
+                  <div class="stats-badge"><i class="bi bi-calendar"></i> {{ review.release_date }}</div>
+                </div>
+                <a href="{{ url_for('reviews.review_detail', review_id=review.id) }}" class="review-btn">
+                  Read Review <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      
+      <!-- Pagination -->
+      {% if total_pages > 1 %}
+      <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination">
+          <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('reviews.reviews_list', category=current_category, brand=current_brand, price_range=current_price, sort_by=current_sort, page=current_page-1) }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          
+          {% for page in range(1, total_pages + 1) %}
+          <li class="page-item {% if page == current_page %}active{% endif %}">
+            <a class="page-link" href="{{ url_for('reviews.reviews_list', category=current_category, brand=current_brand, price_range=current_price, sort_by=current_sort, page=page) }}">
+              {{ page }}
+            </a>
+          </li>
+          {% endfor %}
+          
+          <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('reviews.reviews_list', category=current_category, brand=current_brand, price_range=current_price, sort_by=current_sort, page=current_page+1) }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      {% endif %}
+      
+      {% else %}
+      <!-- No Results -->
+      <div class="no-results" data-aos="fade-up" data-aos-duration="800">
+        <i class="bi bi-search no-results-icon"></i>
+        <h3 class="mb-3">No products found</h3>
+        <p class="text-secondary mb-4">We couldn't find any products matching your filter criteria.</p>
+        <a href="{{ url_for('reviews.clear_filters') }}" class="btn btn-outline-secondary">Clear All Filters</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right" data-aos-duration="800">
+        <h2 class="fw-bold mb-3">Get Exclusive Gear Reviews</h2>
+        <p class="opacity-75 mb-0">
+          Subscribe to our newsletter and be the first to read about new
+          releases, special offers, and pro tips.
+        </p>
+      </div>
+      <div class="col-lg-6" data-aos="fade-left" data-aos-duration="800">
+        <form class="d-flex">
+          <input
+            type="email"
+            class="form-control form-control-lg shadow-sm me-2"
+            placeholder="Your email address"
+            required
+          />
+          <button type="submit" class="btn btn-light btn-lg shadow-sm px-4">
+            Subscribe
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize AOS animations
+    AOS.init({
+      once: true,
+      offset: 100
+    });
+  });
+</script>
+{% endblock %}
